@@ -1,141 +1,167 @@
-//bunny instance
 var b;
-//x and y for drawing a line
 var y = 0;
 var x = 0;
-//color iterator
 var c = 0;
+var pause = false;
+var last = true;
+var mobile = false;
+var help = false;
+var rbuf = new RingBuffer(6);
+var textblasen = rbuf.getData();
+var showLebenslauf = false;
+var showAnschreiben = true;
+var earth;
+var display;
+var multiscreen;
+
 function preload() {
   //preloading background
-  song = loadSound('assets/sound_low.mp3');
-  bg = loadImage('assets/background.jpg');
+  var host = window.location.host;
+  var subdomain = host.split('.')[0];
+  song2 = loadSound('assets/bewerbung2.ogg');
+  song3 = loadSound('assets/bewerbung.ogg');
+  var x = random(0, 99);
+  if (x <= 90) {
+    song = song2;
+  } else {
+    song = song3;
+  }
 }
 
 function setup() {
+  var timedQueue = new TimedQueue();
+  earth = new Earth();
+  if (windowHeight / windowWidth > 1) {
+    mobile = true;
+  }
   createCanvas(windowWidth, windowHeight);
 
-  //initialize bunny
-  b = new Bunny();
-  b.setXoff(1);
-  d = new Bunny();
-  d.setXoff(2);
-  d.setImagePath('hase2.png');
-  t = new IntroText();
-  song.stop();
+  mar = new Marco();
+  scanlines = new Scanlines();
+  //deactivated
+  a = new Anschreiben();
+  multiscreen = new MultiLineDisplay(100, 0.001);
+  var ansch = a.getText();
+
+  for (var i = 0; i < ansch.length; i++) {
+    multiscreen.setText(ansch[i]);
+  }
+
+  l = new Lebenslauf();
+  mar.setXoff(0.2);
+  display = new SingleLineDisplay();
+  sprache = new IntroText(display);
+  sprache.setTextIndex(-1);
+}
+function touchStarted() {}
+
+function deviceTurned() {
+  location.reload();
+}
+function windowResized() {
+  resizeCanvas(windowWidth, windowHeight);
+}
+function mousePressed() {
+  showAnschreiben = !showAnschreiben;
+  showLebenslauf = !showLebenslauf;
+  if (!song.isPlaying()) {
+    userStartAudio();
+    last = !last;
+    song.play();
+    pause = false;
+  }
+  var s = new ScreenMatrix();
+  s.initMatrix();
+  for (var i = 0; i < 80; i++) {
+    s.append(random(0, 100));
+  }
 }
 
-function mousePressed() {
-  if (!song.isPaused()) {
-    song.pause();
-  } else {
+function keyPressed() {
+  if (keyCode === 67 || keyCode === 99) {
+    song.jump(190);
+  } else if (keyCode === 83 || keyCode === 115) {
+    song.jump(24);
+  } else if (keyCode === 65 || keyCode === 97) {
+    song.jump(0);
+  } else if (keyCode === 50) {
+    showLebenslauf = !showLebenslauf;
+    showAnschreiben = false;
+  } else if (keyCode === 49) {
+    showAnschreiben = !showAnschreiben;
+    showLebenslauf = false;
+  } else if (keyCode === 51) {
+    var tmp = song.currentTime();
+    song.stop();
+    song = song2;
     song.play();
+    song.jump(tmp);
+  } else if (keyCode === 52) {
+    var tmp = song.currentTime();
+    song.stop();
+    song = song3;
+    song.play();
+    song.jump(tmp);
   }
 }
 
 function draw() {
-  //draw background
-  background(bg);
-  //update and draw bunny
-  b.update();
-  b.draw();
-  d.draw();
-  d.update();
-  t.update();
-  t.draw();
+  background(255);
 
-  //draw line up down
-  stroke(c, 255 % c, 255 % c, 80);
-  for (let index = 0; index < 1920; index += 1) {
-    line(0, y + index, width, y + index);
+  if (showAnschreiben) {
+    //a.draw();
+    multiscreen.update();
+    multiscreen.draw();
   }
-  //draw line from left to right
-  for (let index = 0; index < 1080; index += 1) {
-    line(x + index, 0, x + index, height);
+  if (showLebenslauf) {
+    l.draw();
+    display.update();
+    display.draw();
   }
-  y++;
-  x++;
-  c++;
-  //reset all
-  if (y > height) {
-    y = -1920;
-  }
-  if (x > width) {
-    x = -1080;
-  }
-  if (c > 255) {
-    c = 0;
-  }
-  if (!song.isPlaying() && !song.isPaused()) {
-    song.play();
-  }
-}
-function keyPressed() {
-  outputVolume(0.5, 1, 0);
-  if (value === 0) {
-    value = 255;
+
+  sprache.setPos(mar.getPos());
+  if (!song.isPlaying()) {
+    sprache.setTextIndex(-1);
+    if (!help) {
+      help = true;
+      //Todo Texte ins Json Templatisieren
+      /*display.setText(
+        'Drücken Sie die Maustaste zum Start. Drücken Sie [1] für Anschreiben. [2] für Lebenslauf. [3] Für Tonspur 1. [4] Für Tonspur 2.',
+      );
+      */
+    }
   } else {
-    value = 0;
+    sprache.update();
+    mar.update();
+    mar.draw();
+    sprache.setTextIndex(Math.floor(song.currentTime()));
+    sprache.draw();
   }
-}
+  earth.draw();
 
-function IntroText() {
-  this.s = [
-    'Willkommen',
-    'bei Marco Kittel',
-    'Von Beruf',
-    'bin ich',
-    'Softwareentwickler',
-  ];
-  textFont('Georgia', 10, 90);
-  this.time = millis() / 1000 + 2;
-  this.textIndex = 0;
-  this.ts = 40;
-  this.x = windowWidth / 2;
-  this.shrinkMode = true;
-  this.update = function () {
-    if (this.time <= millis() / 1000) {
-      this.time = millis() / 1000 + 2;
-      this.textIndex++;
-      this.textIndex = this.textIndex % this.s.length;
+  textblasen = rbuf.getData();
+  for (var i = 0; i < textblasen.length; i++) {
+    if (textblasen[i] != null) {
+      if (mobile) {
+        var gravity = createVector(3, 0.2 * textblasen[i].mass);
+      } else {
+        var gravity = createVector(random(5, 30), 0.2 * textblasen[i].mass);
+      }
+      earth.setPos(mouseX, mouseY);
+      f = earth.anziehung(textblasen[i]);
+      textblasen[i].applyForce(gravity);
+      textblasen[i].update();
+      textblasen[i].draw();
+      textblasen[i].checkEdges();
+      if (!mobile && song.currentTime() > 20) {
+        textblasen[i].bounceRight();
+      }
+      textblasen[i].bounceLeft();
+      var bla = constrain(mouseX, 800, windowWidth + 400);
+      rect(bla, 10, windowWidth, windowHeight);
+      fill(0, 0, 0, 0);
     }
-    this.x = noise(this.x) * windowWidth * 0.01 + windowWidth / 2 - 200;
-    textSize(this.ts);
-    if (this.shrindMode) {
-      this.ts += 0.2;
-    } else {
-      this.ts -= 0.2;
-    }
-    if (this.ts > 54 || this.ts < 40) {
-      this.shrindMode = !this.shrindMode;
-    }
-  };
-  this.draw = function () {
-    fill(200, 250, 00);
-    text(this.s[this.textIndex], mouseX + 10, mouseY + 10);
-  };
-}
+  }
 
-function Bunny() {
-  this.setXoff = function (xoff) {
-    this.xoff = xoff;
-  };
-  this.setImagePath = function (img) {
-    this.img = loadImage('assets/' + img);
-  };
-  this.img = loadImage('assets/hase.png');
-  this.xoff = 0;
-  this.yoff = 0;
-  this.width = 480;
-  this.height = 490;
-  this.pos = createVector(0, 0);
-  this.update = function () {
-    this.pos.x = noise(this.xoff) * width - this.width / 2;
-    this.pos.y = noise(this.yoff) * height - this.height / 2;
-    this.xoff += 0.01;
-    this.yoff += 0.01;
-  };
-
-  this.draw = function () {
-    image(this.img, this.pos.x, this.pos.y, this.width, this.height);
-  };
+  scanlines.draw();
 }

@@ -1,4 +1,16 @@
-html, body {
+@import url('https://fonts.googleapis.com/css?family=Muli&display=swap');
+@import url('https://fonts.googleapis.com/css?family=Quicksand&display=swap');
+@import url('https://fonts.googleapis.com/css?family=Coiny&display=swap');
+
+@font-face {
+  font-family: 'Rubik';
+  src: url('assets/rubik.ttf') format('ttf'),
+    /* Chrome 6+, Firefox 3.6+, IE 9+, Safari 5.1+ */ url('assets/rubik.ttf')
+      format('truetype'); /* Chrome 4+, Firefox 3.5, Opera 10+, Safari 3—5 */
+}
+
+html,
+body {
   margin: 0;
   padding: 0;
 }

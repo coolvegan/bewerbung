@@ -1,0 +1,589 @@
+var b;
+var y = 0;
+var x = 0;
+var c = 0;
+var pause = false;
+var last = true;
+var mobile = false;
+var help = false;
+function preload() {
+  b = new Marco();
+  //preloading background
+  var host = window.location.host;
+  var subdomain = host.split('.')[0];
+  song = loadSound('assets/bewerbung.ogg');
+  if (subdomain != '127') {
+    bg = loadImage('assets/' + subdomain + '.png');
+  } else {
+    bg = loadImage('assets/background.jpg');
+  }
+}
+
+function setup() {
+  if (windowHeight / windowWidth > 1) {
+    mobile = true;
+  }
+  createCanvas(windowWidth, windowHeight);
+
+  a = new Anschreiben();
+  l = new Lebenslauf();
+  b.setXoff(0.2);
+  sprache = new IntroText();
+  sprache.setTextIndex(-1);
+  song.stop();
+}
+
+
+function mousePressed() {
+  if(!help && mobile){
+    help=true;
+    userStartAudio();
+  } else {
+  if (!song.isPlaying()) {
+    last = !last;
+    song.play();
+    pause = false;
+  } else {
+    song.pause();
+  }
+ }
+
+}
+function keyPressed() {
+  if (keyCode === 67 || keyCode === 99) {
+    song.jump(190);
+  } else if (keyCode === 83 || keyCode === 115) {
+    song.jump(24);
+  } else if (keyCode === 65 || keyCode === 97) {
+    song.jump(0);
+  }
+}
+
+function draw() {
+  background(bg);
+  sprache.setPos(b.getPos());
+  if (!song.isPlaying()) {
+    if (last) {
+      a.draw();
+    } else {
+      l.draw();
+    }
+  }
+  if (!song.isPlaying()) {
+    sprache.setTextIndex(-1);
+  } else {
+    sprache.update();
+    b.update();
+    b.draw();
+    sprache.setTextIndex(Math.floor(song.currentTime()));
+    sprache.draw();
+  }
+
+  //draw line up down
+  stroke(c, 255 % c, 255 % c, 80);
+  for (let index = 0; index < 1920; index += 1) {
+    line(0, y + index, width, y + index);
+  }
+  //draw line from left to right
+  for (let index = 0; index < 1080; index += 1) {
+    line(x + index, 0, x + index, height);
+  }
+  y++;
+  x++;
+  c++;
+  //reset all
+  if (y > height) {
+    y = -1920;
+  }
+  if (x > width) {
+    x = -1080;
+  }
+  if (c > 255) {
+    c = 0;
+  }
+}
+
+function IntroText() {
+  var host = window.location.host;
+  var subdomain = host.split('.')[0];
+  this.pos = createVector(0, 0);
+  const textmap = new Map();
+  //todo, in json auslagern
+  textmap.set(-1, '.....');
+  textmap.set(0, 'Hallo ' + subdomain + '  mein Name ist Marco Kittel');
+  textmap.set(1, 'Hallo ' + subdomain + '  mein Name ist Marco Kittel');
+  textmap.set(2, 'Ich such einen Job');
+  textmap.set(3, 'Ich such einen Job');
+  textmap.set(4, 'Als Softwareentwickler oder Dev Op');
+  textmap.set(5, 'Als Softwareentwickler oder Dev Op');
+  textmap.set(6, 'Meine Skills sind ziemlich umfassend');
+  textmap.set(7, 'Meine Skills sind ziemlich umfassend');
+  textmap.set(8, 'Meine Skills sind ziemlich umfassend');
+  textmap.set(9, 'Ich lerne schnell, bin für jede Stelle passend');
+  textmap.set(9, 'Ich lerne schnell, bin für jede Stelle passend');
+  textmap.set(10, 'Ich lerne schnell, bin für jede Stelle passend');
+  textmap.set(11, 'Ich lerne schnell, bin für jede Stelle passend');
+  textmap.set(12, 'Bitte stellen Sie mich ein');
+  textmap.set(13, 'Bitte stellen Sie mich ein');
+  textmap.set(14, 'Ich möchte nicht mehr arbeitslos sein');
+  textmap.set(15, 'Ich möchte nicht mehr arbeitslos sein');
+  textmap.set(16, 'Ich möchte nicht mehr arbeitslos sein');
+  textmap.set(17, 'Ich möchte nicht mehr arbeitslos sein');
+  textmap.set(18, 'Mein Lebenslauf sieht ziemlich schlecht aus');
+  textmap.set(19, 'Mein Lebenslauf sieht ziemlich schlecht aus');
+  textmap.set(20, 'Mein Lebenslauf sieht ziemlich schlecht aus');
+  textmap.set(21, 'Glauben Sie mir, ich hab es echt drauf');
+  textmap.set(22, 'Glauben Sie mir, ich hab es echt drauf');
+  textmap.set(23, 'Glauben Sie mir, ich hab es echt drauf');
+  textmap.set(23, 'Glauben Sie mir, ich hab es echt drauf');
+  textmap.set(24, 'Hier eine Auflistung');
+  textmap.set(25, 'Meiner Skills');
+  textmap.set(27, 'HTML, CSS');
+  textmap.set(28, 'Javascript');
+  textmap.set(29, 'Ganz gut');
+  textmap.set(31, 'VueJS');
+  textmap.set(32, 'V2');
+  textmap.set(33, 'Eigentlich ganz gut');
+  textmap.set(34, 'Java');
+  textmap.set(36, 'Doch ganz gut');
+  textmap.set(37, 'Spring Boot');
+  textmap.set(38, 'Ganz gut');
+  textmap.set(39, 'Ganz gut');
+  textmap.set(40, 'C, C++');
+  textmap.set(41, 'gut');
+  textmap.set(42, 'gut');
+  textmap.set(43, 'Delphi, Pascal');
+  textmap.set(44, 'Sehr gut');
+  textmap.set(45, 'Sehr gut');
+  textmap.set(46, 'Ruby, Sinatra');
+  textmap.set(47, 'Rails');
+  textmap.set(48, 'Ok');
+  textmap.set(49, 'Go');
+  textmap.set(50, 'Go, Buffalo');
+  textmap.set(51, 'Ok');
+  textmap.set(52, 'Visual Basic');
+  textmap.set(53, 'Ok');
+  textmap.set(54, 'C#');
+  textmap.set(55, 'Geht so');
+  textmap.set(56, 'Geht so');
+  textmap.set(57, 'Typescript');
+  textmap.set(58, 'Ja');
+  textmap.set(59, 'Ja');
+  textmap.set(60, 'Dart');
+  textmap.set(61, 'Ja gar nicht mal so schlecht');
+  textmap.set(62, 'Flutter');
+  textmap.set(63, 'Ganz gut');
+  textmap.set(64, 'Schon einige Projekte privat umgesetzt');
+  textmap.set(65, 'Schon einige Projekte privat umgesetzt');
+  textmap.set(66, 'Python, och ja');
+  textmap.set(67, 'Ganz gut');
+  textmap.set(68, 'PHP');
+  textmap.set(69, 'Ganz ok');
+  textmap.set(70, 'Bash, Fish Shell');
+  textmap.set(71, 'Sehr gut');
+  textmap.set(72, 'Sehr gut');
+  textmap.set(73, 'Kotlin, ja');
+  textmap.set(74, 'toll');
+  textmap.set(75, 'JQuery');
+  textmap.set(76, 'Gut');
+  textmap.set(77, 'Tickle');
+  textmap.set(78, 'TCL');
+  textmap.set(79, 'Ok');
+  textmap.set(80, 'Bootstrap');
+  textmap.set(81, 'Gut');
+  textmap.set(82, 'Virtualisierung, Proxmox');
+  textmap.set(83, 'Containerisierung');
+  textmap.set(84, 'Docker');
+  textmap.set(85, 'Sehr... sehr gut');
+  textmap.set(86, 'Sehr... sehr gut');
+  textmap.set(87, 'Git... Gitlab');
+  textmap.set(88, 'Selbst hostend');
+  textmap.set(89, 'Super');
+    'assets/marco6.png',
+  textmap.set(90, 'Super');
+  textmap.set(91, 'Kubernetes okay');
+  textmap.set(92, 'Terraform okay');
+  textmap.set(93, 'Helm okay');
+  textmap.set(94, 'Linux, sehr sehr gut');
+  textmap.set(95, 'Linux, sehr sehr gut');
+  textmap.set(96, 'CMake für C');
+  textmap.set(97, 'CMake für C');
+  textmap.set(98, 'Gut');
+  textmap.set(99, 'Azure');
+  textmap.set(100, 'Ok');
+  textmap.set(101, 'NodeJS');
+  textmap.set(102, 'Ganz ok');
+  textmap.set(103, 'Fastreport');
+  textmap.set(104, 'Ok');
+  textmap.set(105, 'ORM, Hibernate');
+  textmap.set(106, 'Doctrine');
+  textmap.set(107, 'Also Object Relationship Mapper');
+  textmap.set(108, 'Also Object Relationship Mapper');
+  textmap.set(109, 'Gut');
+  textmap.set(110, 'HL 7');
+  textmap.set(111, 'Ok');
+  textmap.set(112, 'Microservices');
+  textmap.set(113, 'Ja, ganz gut');
+  textmap.set(115, 'REST');
+  textmap.set(116, 'Super');
+  textmap.set(117, 'Super');
+  textmap.set(118, 'Soap, naja');
+  textmap.set(119, 'SQL, super gut');
+  textmap.set(120, 'SQL, super gut');
+  textmap.set(121, 'Postgres, MariaDB');
+  textmap.set(122, 'Postgres, MariaDB');
+  textmap.set(123, 'Ja, kann ich hosten');
+  textmap.set(124, 'Kann ich administrieren');
+  textmap.set(125, 'Kann ich administrieren');
+  textmap.set(126, 'Kann ich installieren');
+  textmap.set(127, 'Kann ich installieren');
+  textmap.set(128, 'Crystal');
+  textmap.set(129, 'Ein Ruby Klon');
+  textmap.set(130, 'Okay');
+  textmap.set(131, 'C# und Mono , okay');
+  textmap.set(132, 'C# und Mono , okay');
+  textmap.set(133, 'QT5, naja');
+  textmap.set(134, 'GTK, geht');
+  textmap.set(135, 'GTK, geht');
+  textmap.set(136, 'Go und Fyne');
+  textmap.set(137, 'Naja');
+  textmap.set(138, 'Vim, Nvim, super');
+  textmap.set(139, 'Nginx');
+  textmap.set(140, 'Administrierung');
+  textmap.set(141, 'Super gut');
+  textmap.set(142, 'Eigenen Server administrieren');
+  textmap.set(143, 'Super gut');
+    'assets/marco6.png',
+  textmap.set(144, 'Apache, administrieren, super gut');
+  textmap.set(145, 'Apache, administrieren, super gut');
+  textmap.set(146, 'JRuby, ok');
+  textmap.set(147, 'JRuby, ok');
+  textmap.set(148, 'JRuby, ok');
+  textmap.set(149, 'Raspberry PI');
+  textmap.set(150, 'GPIO Programmierung');
+  textmap.set(151, 'Ganz gut.');
+  textmap.set(152, 'Arduino, ganz gut');
+  textmap.set(153, 'Designpatterns');
+  textmap.set(154, 'Ja, ganz gut');
+  textmap.set(155, 'Lieblingspattern');
+  textmap.set(156, 'ist, das');
+  textmap.set(157, 'Strategy Pattern');
+  textmap.set(158, 'Clean Code, SOLID');
+  textmap.set(159, 'Lieb ich');
+  textmap.set(160, 'MongoDB, ganz ok');
+  textmap.set(161, 'ReddisDB');
+  textmap.set(162, 'ReddisDB');
+  textmap.set(163, 'ok');
+  textmap.set(164, 'LaTeX');
+  textmap.set(165, 'Textsetzung');
+  textmap.set(166, 'ja, super');
+  textmap.set(167, 'ja, super');
+    'assets/marco6.png',
+  textmap.set(168, 'Micronaut, Quarkus');
+  textmap.set(169, 'Ja');
+  textmap.set(170, 'schonmal mit gespielt');
+  textmap.set(171, 'schonmal mit gespielt');
+  textmap.set(172, 'Maven, ganz ok');
+  textmap.set(173, 'Gradle, ganz ok');
+  textmap.set(174, 'Android Dev');
+  textmap.set(175, 'App Dev Entwicklung');
+  textmap.set(176, 'App Dev Entwicklung');
+  textmap.set(177, 'Ganz ok');
+  textmap.set(178, 'Lua, okay');
+  textmap.set(179, 'Rust, naja');
+  textmap.set(180, 'IPFS');
+  textmap.set(181, 'Web3');
+  textmap.set(182, 'Ganz ok');
+  textmap.set(183, 'Web3');
+  textmap.set(184, 'Generell');
+  textmap.set(185, 'Naja');
+  textmap.set(186, 'Solidity');
+  textmap.set(187, 'Für Blockchains');
+  textmap.set(188, 'Für Blockchains');
+  textmap.set(189, 'Ganz okay');
+  textmap.set(190, 'Bitte kontaktiere mich unter');
+  textmap.set(191, '0176/34577186');
+  textmap.set(192, '0176/34577186');
+  textmap.set(193, '0176/34577186');
+    'assets/marco6.png',
+  textmap.set(194, '0176/34577186');
+  textmap.set(195, 'Oder über job@kittel.dev');
+  textmap.set(196, 'Oder über job@kittel.dev');
+  textmap.set(197, 'Oder über job@kittel.dev');
+  textmap.set(198, 'Oder über job@kittel.dev');
+  textmap.set(199, 'Vielen Dank für dein Vertrauen.');
+  textmap.set(200, 'Vielen Dank für dein Vertrauen.');
+  textmap.set(201, 'Vielen Dank für dein Vertrauen.');
+
+  if (mobile) {
+    var MAX_COLOR_SIZE = 18;
+    var MIN_COLOR_SIZE = 12;
+  } else {
+    var MAX_COLOR_SIZE = 34;
+    var MIN_COLOR_SIZE = 26;
+  }
+  var ts_interval = 0.2;
+  if (mobile) {
+    ts_interval = 0.05;
+  }
+
+  textFont('Georgia', 10, 90);
+
+  this.time = millis() / 1000 + 2;
+  this.textIndex = -1;
+  this.ts = MIN_COLOR_SIZE;
+  this.pos.x = windowWidth / 2;
+  this.pos.y = windowHeight / 2;
+  this.shrinkMode = true;
+  this.update = function () {
+    textSize(this.ts);
+    if (this.time <= millis() / 1000) {
+      this.time = millis() / 1000 + 2;
+    }
+    if (this.shrindMode) {
+      this.ts += ts_interval;
+    } else {
+      this.ts -= ts_interval;
+    }
+    if (this.ts > MAX_COLOR_SIZE || this.ts < MIN_COLOR_SIZE) {
+      this.shrindMode = !this.shrindMode;
+    }
+  };
+  this.draw = function () {
+    if (this.textIndex <= textmap.size) {
+      var textSize = 0;
+      if (textmap.get(this.textIndex)) {
+        textSize = textmap.get(this.textIndex).length;
+      }
+      var offset = 0;
+      if (textSize < 20) {
+        offset += 50;
+      } else if (textSize < 16) {
+        offset += 200;
+      } else if (textSize > 30) {
+        offset += 00;
+      }
+
+      if (textSize > 0) {
+        if (mobile) {
+          fill(255, 230, 50, 200);
+          ellipse(this.pos.x - 100, this.pos.y, 300+(3*textSize), 150);
+          fill(100, 100, 10, 255);
+          text(
+            textmap.get(this.textIndex),
+            this.pos.x - 250 + offset + 1 * textSize,
+            this.pos.y,
+          );
+        } else {
+          fill(255, 230, 50, 200);
+          ellipse(
+            this.pos.x + 220 - offset,
+            this.pos.y + 1,
+            500 + textSize * 6 - offset,
+            130 + this.ts * 2,
+          );
+          fill(100, 100, 10, 255);
+          text(textmap.get(this.textIndex), this.pos.x + offset, this.pos.y);
+        }
+      }
+    }
+  };
+  this.setTextIndex = function (value) {
+    this.textIndex = value;
+  };
+  this.setPos = function (posVector) {
+    if (mobile) {
+      this.pos.x = posVector.x + 300;
+      this.pos.y = posVector.y + 30;
+    } else {
+      this.pos.x = posVector.x + 350;
+      this.pos.y = posVector.y + 30;
+    }
+  };
+}
+
+function Bunny() {
+  this.setXoff = function (xoff) {
+    this.xoff = xoff;
+  };
+  this.setImagePath = function (img) {
+    this.img = loadImage('assets/' + img);
+  };
+  this.img = loadImage('assets/marco.png');
+  this.xoff = 0;
+  this.yoff = 0;
+  if (mobile) {
+    this.width = 150;
+    this.height = 200;
+  } else {
+    this.width = 300;
+    this.height = 350;
+  }
+  this.pos = createVector(0, 0);
+  this.update = function () {
+    if (mobile) {
+      this.pos.x = noise(this.xoff) * windowWidth - this.width / 2;
+      this.pos.y = noise(this.yoff) * height - this.height / 2;
+    } else {
+      this.pos.x = noise(this.xoff) * width - this.width / 2;
+      this.pos.y = noise(this.yoff) * height - this.height / 2;
+    }
+      this.xoff += 0.005;
+      this.yoff += 0.005;
+  };
+
+  this.getPos = function () {
+    return this.pos;
+  };
+
+  this.draw = function () {
+    image(this.img, this.pos.x, this.pos.y, this.width, this.height);
+    fill(200, 250, 00);
+  };
+}
+
+function Anschreiben() {
+  var host = window.location.host;
+  var subdomain = host.split('.')[0];
+  var gehalt = random(40, 65);
+  var offset = 30;
+  var s = [
+    'Sehr geehrte Damen und Herren',
+    '',
+    subdomain + ' sucht gute Softwareentwickler. Es wäre mir eine Freude',
+    'euch unterstützen zu dürfen. Verfügbar wäre ich sofort.',
+    'Gehalt ab ' + Math.floor(gehalt) + '.000 Euro im Jahr wäre ganz nett.',
+    'Mich fesseln vor allem spannende Aufgaben. Geld ist da leider',
+    'ein notwendiges Übel. Ich liebe Softwareentwicklung.',
+    'Ich bin sehr zuverlässig, arbeite sehr analytisch, voller Freude und ',
+    'bin sowohl im Team als auch als Einzelkämpfer stets erfolgreich.',
+    '',
+    'Meine Skills findest du im Sprachmodus mit der Taste s.',
+    'Meine Kontaktdaten im selben Modus mit der Taste c.',
+    'Den Sprachmodus aktivierst du durch den Druck auf die',
+    'linke Maustaste.',
+    '',
+    'Für den Lebenslauf einfach zwei mal mit der Maus klicken.',
+    '',
+    'Mit freundlichen Grüßen',
+    'Marco Kittel',
+  ];
+  this.pos = createVector(50, windowHeight / 8);
+  this.draw = function () {
+    textFont('Georgia', 24, 90);
+    rectMode(CORNER);
+    fill(255);
+    if (mobile) {
+      rect(25, 25, windowWidth - 50, windowHeight * 0.9); //
+      textFont('Georgia', 16, 90);
+    } else {
+      rect(25, 25, windowWidth / 3, windowHeight * 0.9); //
+    }
+    fill(0, 0, 0, 255);
+    text('Sehr geehrte Damen und Herren,', this.pos.x, this.pos.y);
+    for (i = 1; i < s.length; i++) {
+      if (mobile) {
+        textSize(10);
+      } else {
+        textSize(18);
+      }
+      text(s[i], this.pos.x, this.pos.y + i * offset);
+    }
+  };
+}
+
+function Lebenslauf() {
+  if (mobile) {
+    this.pos = createVector(1, 2);
+  } else {
+    this.pos = createVector(10, 30);
+  }
+
+  this.img = loadImage('assets/lebenslauf.png');
+  this.draw = function () {
+    if (mobile) {
+      var x = windowWidth;
+      var y = windowHeight;
+      image(this.img, this.pos.x, this.pos.y, x, y);
+    } else {
+      image(
+        this.img,
+        this.pos.x,
+        this.pos.y,
+        this.width / 3,
+        this.height * 0.9,
+      );
+    }
+  };
+}
+
+
+
+
+  function Marco() {
+  this.time = millis() / 1000 + 2;
+  this.imageIndex = 0;
+  this.setXoff = function (xoff) {
+    this.xoff = xoff;
+  };
+  this.myimgObj = new Array();
+  //Pseudosprite
+  //Todo Imagemaps nutzen
+  this.myimg = new Array(
+    'assets/marco1.png',
+    'assets/marco2.png',
+    'assets/marco3.png',
+    'assets/marco4.png',
+    'assets/marco5.png',
+    'assets/marco6.png',
+    'assets/marco7.png',
+  );
+  for (let index = 0; index < this.myimg.length; index++) {
+    this.myimgObj[index] = loadImage(this.myimg[index]);
+  }
+  this.xoff = 0;
+  this.yoff = 0;
+  if (mobile) {
+    this.width = 250;
+    this.height = 300;
+  } else {
+    this.width = 400;
+    this.height = 650;
+  }
+  this.pos = createVector(0, 0);
+  this.update = function () {
+    if (this.time <= millis() / 1000) {
+      this.imageIndex++;
+      this.time = millis() / 1000 + 2;
+    }
+    if (mobile) {
+      this.pos.x = noise(this.xoff) * windowWidth - this.width / 2;
+      this.pos.y = noise(this.yoff) * height - this.height / 2;
+      this.xoff += 0.01;
+      this.yoff += 0.01;
+    } else {
+      this.pos.x = noise(this.xoff) * width - this.width / 2;
+      this.pos.y = noise(this.yoff) * height - this.height / 2;
+      this.xoff += 0.01;
+      this.yoff += 0.01;
+    }
+  };
+
+  this.getPos = function () {
+    return this.pos;
+  };
+
+  this.draw = function () {
+    //this.pos.y-200
+    //quick & dirty fix
+    image(
+      this.myimgObj[this.imageIndex % this.myimgObj.length],
+      this.pos.x,
+      this.pos.y-200,
+      this.width,
+      this.height,
+    );
+    fill(200, 250, 00);
+  };
+ }
+
